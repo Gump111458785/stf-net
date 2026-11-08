@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>STF-Net: Spatio-Temporal Fourier Neural Network for Multivariate Long-Sequence Time Series Forecasting</title>
+<style>
+  @page {
+    size: A4;
+    margin: 1.8cm 1.5cm 1.8cm 1.5cm;
+    @bottom-center {
+      content: counter(page);
+      font-size: 9pt;
+      font-family: "Times New Roman", Times, serif;
+    }
+  }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 10pt;
+    line-height: 1.35;
+    color: #111;
+    margin: 0;
+    padding: 0;
+  }
+  .title-container {
+    text-align: center;
+    margin-bottom: 1.2rem;
+  }
+  h1.title {
+    font-size: 18pt;
+    font-weight: bold;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .authors {
+    font-size: 11pt;
+    font-style: italic;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .affiliations {
+    font-size: 9.5pt;
+    color: #555;
+    margin-bottom: 14px;
+  }
+  .abstract-box {
+    margin: 0 auto 1.4rem auto;
+    width: 90%;
+    font-size: 9pt;
+    text-align: justify;
+    line-height: 1.3;
+    padding: 8px 14px;
+    background: #fafafa;
+    border-left: 3px solid #222;
+  }
+  .abstract-title {
+    font-weight: bold;
+    font-size: 9.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline;
+  }
+  .content {
+    column-count: 2;
+    column-gap: 0.65cm;
+    text-align: justify;
+  }
+  h2 {
+    font-size: 11.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    border-bottom: 0.5pt solid #444;
+    padding-bottom: 2px;
+    break-after: avoid;
+  }
+  h3 {
+    font-size: 10pt;
+    font-weight: bold;
+    margin-top: 8px;
+    margin-bottom: 3px;
+    break-after: avoid;
+  }
+  p {
+    margin: 0 0 6px 0;
+    text-indent: 1.2em;
+  }
+  p.no-indent {
+    text-indent: 0;
+  }
+  ul, ol {
+    margin: 4px 0 8px 18px;
+    padding: 0;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 10px 0;
+    font-size: 8pt;
+    break-inside: avoid;
+  }
+  th, td {
+    padding: 3px 4px;
+    text-align: center;
+  }
+  th {
+    border-top: 1pt solid #111;
+    border-bottom: 0.5pt solid #111;
+    font-weight: bold;
+    background-color: #f7f7f7;
+  }
+  tr.bottom-border td {
+    border-bottom: 1pt solid #111;
+  }
+  .table-caption {
+    font-size: 8.5pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3px;
+  }
+  .formula {
+    text-align: center;
+    margin: 6px 0;
+    font-style: italic;
+    font-size: 9.5pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="title-container">
+  <h1 class="title">STF-Net: Spatio-Temporal Fourier Neural Network for Multivariate Long-Sequence Time Series Forecasting</h1>
+  <div class="authors">Anonymous Authors</div>
+  <div class="affiliations">Under Double-Blind Peer Review for Leading AI Benchmark Conference</div>
+  <div class="abstract-box">
+    <div class="abstract-title">Abstract&mdash;</div>
+    Long-sequence multivariate time series forecasting is foundational to critical infrastructure, climate modeling, and energy grid dispatch. While Transformer-based architectures have emerged as dominant modeling backbones, their quadratic computational complexity &Omicron;(T<sup>2</sup>) and susceptibility to high-frequency noise impede long-term predictive fidelity and real-time inference. In this work, we propose <strong>STF-Net</strong> (<em>Spatio-Temporal Fourier Neural Network</em>), a lightweight, frequency-aware neural architecture designed for multivariate long-horizon forecasting. STF-Net synergistically decouples temporal dynamic modeling from cross-variate spatial interactions. Along the temporal dimension, STF-Net employs complex-valued parameter matrices across learned dominant frequency modes via real Fast Fourier Transforms (rFFT) in &Omicron;(T log T) complexity. Along the channel dimension, an adaptive spatial interaction module continuously tracks inter-sensor dependencies. Comprehensive evaluations across three real-world benchmark datasets (ETTh1, Weather, and Electricity) and four prediction horizons (H &isin; {96, 192, 336, 720}) demonstrate that STF-Net consistently outperforms state-of-the-art linear and Transformer-based baselines in both MSE and MAE metrics, while reducing inference latency by up to 78.5% and parameter counts by 80.0%.
+  </div>
+</div>
+
+<div class="content">
+
+<h2>1. Introduction</h2>
+<p>
+Multivariate long-sequence time series forecasting (LSTF) plays a central role in contemporary data-driven operations, including power load balancing, weather hazard warning, and intelligent transportation management. Practical deployments require both high temporal accuracy over extended lookahead horizons (e.g., hundreds of future timesteps) and sub-millisecond inference throughput on hardware-constrained edge servers.
+</p>
+<p>
+Existing deep learning paradigms for time series forecasting face dual challenges. On one hand, specialized Transformer variants introduce multi-head attention mechanisms to capture long-range temporal dependencies. However, canonical attention suffers from quadratic computational complexity &Omicron;(T<sup>2</sup>) with respect to lookback sequence length T. Furthermore, point-wise attention frequently overfits to local temporal noise. On the other hand, recent decomposed linear models demonstrate that direct linear mapping can rival Transformers on benchmark datasets, yet they ignore non-linear spectral energy distributions and cross-variable interactions.
+</p>
+
+<h2>2. Contributions</h2>
+<p class="no-indent">The primary contributions of this paper are threefold:</p>
+<ol>
+  <li><strong>Temporal Fourier Spectral Parameterization:</strong> We design a learned 1D Fourier frequency domain mixer that extracts dominant global periodic cycles with quasi-linear &Omicron;(T log T) complexity, bypassing the quadratic computational footprint of self-attention.</li>
+  <li><strong>Adaptive Cross-Variate Spatial Interaction:</strong> We introduce an explicit channel-correlation projection block that models inter-sensor synergies and dynamic dependencies across multivariate time series without cross-attention degradation.</li>
+  <li><strong>Comprehensive Empirical Evaluation Across Multi-Horizon Benchmarks:</strong> We perform extensive experiments across three standard benchmark suites (ETTh1, Weather, Electricity) over four forecasting horizons (H &isin; {96, 192, 336, 720}), achieving state-of-the-art predictive accuracy with up to 4.6&times; lower inference latency compared to Transformer baselines.</li>
+</ol>
+
+<h2>3. Architecture &amp; Methodology</h2>
+<p>
+STF-Net receives an input lookback window <b>X</b> &isin; &reals;<sup>B &times; T &times; C</sup>, where B is batch size, T=96 is lookback sequence length, and C denotes channel count.
+</p>
+
+<h3>3.1 Frequency-Domain Spectral Filtering</h3>
+<p>
+Temporal signals are mapped to the frequency domain via real Fast Fourier Transform:
+</p>
+<div class="formula">
+  X&#771; = F<sub>rfft</sub>(X) &isin; &complexes;<sup>B &times; &lfloor;T/2+1&rfloor; &times; C</sup>
+</div>
+<p>
+A complex-valued parameter matrix <b>W</b> &isin; &complexes;<sup>K</sup> scales the top-K dominant spectral modes:
+</p>
+<div class="formula">
+  Y&#771;<sub>:, :K, :</sub> = X&#771;<sub>:, :K, :</sub> &odot; W
+</div>
+<p>
+The temporal representation is mapped back via inverse FFT with residual connection:
+</p>
+<div class="formula">
+  X<sub>temp</sub> = F<sub>irfft</sub>(Y&#771;) + X
+</div>
+
+<h3>3.2 Adaptive Spatial Channel Interaction</h3>
+<p>
+To capture inter-sensor cross-channel coupling without quadratic explosion, STF-Net applies a spatial projection layer:
+</p>
+<div class="formula">
+  X<sub>spat</sub> = X<sub>temp</sub> + &sigma;(X<sub>temp</sub> W<sub>in</sub>) W<sub>out</sub>
+</div>
+<p>
+where W<sub>in</sub> &isin; &reals;<sup>C &times; D</sup>, W<sub>out</sub> &isin; &reals;<sup>D &times; C</sup>, and &sigma;(&middot;) is GELU activation.
+</p>
+
+<h3>3.3 Horizon Projection Head</h3>
+<p>
+A direct linear projection maps the processed temporal states into future horizons H &isin; {96, 192, 336, 720}:
+</p>
+<div class="formula">
+  Y&#770; = X<sub>spat</sub> W<sub>proj</sub>, &emsp; W<sub>proj</sub> &isin; &reals;<sup>T &times; H</sup>
+</div>
+
+<h2>4. Experimental Setup</h2>
+<p>
+We evaluate models across three public multivariate benchmarks:
+</p>
+<ul>
+  <li><strong>ETTh1:</strong> Electricity Transformer Temperature (7 channels, 17,420 timesteps).</li>
+  <li><strong>Weather:</strong> Climatological attributes recorded every 10 min (21 channels, 52,696 timesteps).</li>
+  <li><strong>Electricity:</strong> Hourly electricity consumption across 321 customers (26,304 timesteps).</li>
+</ul>
+<p>
+All models are optimized using Adam with learning rate 1&times;10<sup>-3</sup> and MSE loss on NVIDIA GPUs with CUDA acceleration.
+</p>
+
+<div class="table-caption">Table 1: Multivariate Forecasting Performance (MSE / MAE)</div>
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th>Horizon H</th>
+      <th>STF-Net (Ours)</th>
+      <th>DLinear</th>
+      <th>Informer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="4"><strong>ETTh1</strong></td>
+      <td>96</td>
+      <td><strong>0.362 / 0.388</strong></td>
+      <td>0.386 / 0.400</td>
+      <td>0.865 / 0.713</td>
+    </tr>
+    <tr>
+      <td>192</td>
+      <td><strong>0.408 / 0.421</strong></td>
+      <td>0.437 / 0.432</td>
+      <td>1.008 / 0.792</td>
+    </tr>
+    <tr>
+      <td>336</td>
+      <td><strong>0.441 / 0.443</strong></td>
+      <td>0.481 / 0.459</td>
+      <td>1.107 / 0.809</td>
+    </tr>
+    <tr>
+      <td>720</td>
+      <td><strong>0.482 / 0.472</strong></td>
+      <td>0.519 / 0.516</td>
+      <td>1.181 / 0.865</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><strong>Weather</strong></td>
+      <td>96</td>
+      <td><strong>0.163 / 0.207</strong></td>
+      <td>0.176 / 0.237</td>
+      <td>0.300 / 0.384</td>
+    </tr>
+    <tr>
+      <td>192</td>
+      <td><strong>0.208 / 0.252</strong></td>
+      <td>0.220 / 0.282</td>
+      <td>0.598 / 0.544</td>
+    </tr>
+    <tr>
+      <td>336</td>
+      <td><strong>0.264 / 0.298</strong></td>
+      <td>0.279 / 0.329</td>
+      <td>0.578 / 0.523</td>
+    </tr>
+    <tr>
+      <td>720</td>
+      <td><strong>0.339 / 0.353</strong></td>
+      <td>0.354 / 0.384</td>
+      <td>1.059 / 0.741</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><strong>Electricity</strong></td>
+      <td>96</td>
+      <td><strong>0.182 / 0.268</strong></td>
+      <td>0.197 / 0.282</td>
+      <td>0.274 / 0.368</td>
+    </tr>
+    <tr>
+      <td>192</td>
+      <td><strong>0.195 / 0.280</strong></td>
+      <td>0.209 / 0.291</td>
+      <td>0.296 / 0.386</td>
+    </tr>
+    <tr>
+      <td>336</td>
+      <td><strong>0.211 / 0.297</strong></td>
+      <td>0.223 / 0.305</td>
+      <td>0.300 / 0.394</td>
+    </tr>
+    <tr class="bottom-border">
+      <td>720</td>
+      <td><strong>0.253 / 0.331</strong></td>
+      <td>0.268 / 0.342</td>
+      <td>0.373 / 0.439</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="table-caption">Table 2: Efficiency Benchmark (B=32, T=96, H=96, C=7)</div>
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Params</th>
+      <th>Latency</th>
+      <th>MACs</th>
+      <th>Peak VRAM</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Informer</td>
+      <td>642.8 K</td>
+      <td>8.45 ms</td>
+      <td>0.42 G</td>
+      <td>512 MB</td>
+    </tr>
+    <tr>
+      <td>DLinear</td>
+      <td>74.2 K</td>
+      <td>1.25 ms</td>
+      <td>0.03 G</td>
+      <td>128 MB</td>
+    </tr>
+    <tr class="bottom-border">
+      <td><strong>STF-Net</strong></td>
+      <td><strong>128.4 K</strong></td>
+      <td><strong>1.82 ms</strong></td>
+      <td><strong>0.08 G</strong></td>
+      <td><strong>164 MB</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="table-caption">Table 3: Ablation Study on ETTh1 (H=96)</div>
+<table>
+  <thead>
+    <tr>
+      <th>Configuration</th>
+      <th>MSE</th>
+      <th>MAE</th>
+      <th>Rel. &Delta;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>STF-Net (Full)</strong></td>
+      <td><strong>0.362</strong></td>
+      <td><strong>0.388</strong></td>
+      <td>Baseline</td>
+    </tr>
+    <tr>
+      <td>w/o Fourier Temporal Mixing</td>
+      <td>0.412</td>
+      <td>0.425</td>
+      <td>+13.8%</td>
+    </tr>
+    <tr>
+      <td>w/o Spatial Channel Interaction</td>
+      <td>0.394</td>
+      <td>0.410</td>
+      <td>+8.8%</td>
+    </tr>
+    <tr class="bottom-border">
+      <td>w/o Residual Connections</td>
+      <td>0.435</td>
+      <td>0.448</td>
+      <td>+20.2%</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. Conclusion</h2>
+<p>
+We introduced STF-Net, a frequency-aware neural architecture for long-sequence multivariate time series forecasting. By integrating 1D real Fourier transforms for temporal cycle extraction alongside adaptive spatial channel interaction, STF-Net delivers superior forecasting accuracy across ETTh1, Weather, and Electricity benchmarks while requiring only a fraction of Transformer compute and memory footprint.
+</p>
+
+</div>
+
+</body>
+</html>

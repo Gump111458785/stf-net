@@ -1,0 +1,8 @@
+{
+  "title": "STF-Net: Spatio-Temporal Fourier Neural Network for Multivariate Long-Sequence Time Series Forecasting",
+  "authors": "Anonymous Authors (Double-Blind Peer Review)",
+  "task": "Multivariate Long-term Time Series Forecasting",
+  "metrics": ["MSE", "MAE", "Inference_Latency_ms", "MACs_G", "Params_K"],
+  "benchmarks": ["ETTh1", "Weather", "Electricity"],
+  "horizons": [96, 192, 336, 720]
+}

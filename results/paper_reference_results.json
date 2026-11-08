@@ -1,0 +1,79 @@
+{
+  "ETTh1": {
+    "96": {
+      "STF-Net": { "MSE": 0.362, "MAE": 0.388 },
+      "DLinear": { "MSE": 0.386, "MAE": 0.400 },
+      "Informer": { "MSE": 0.865, "MAE": 0.713 }
+    },
+    "192": {
+      "STF-Net": { "MSE": 0.408, "MAE": 0.421 },
+      "DLinear": { "MSE": 0.437, "MAE": 0.432 },
+      "Informer": { "MSE": 1.008, "MAE": 0.792 }
+    },
+    "336": {
+      "STF-Net": { "MSE": 0.441, "MAE": 0.443 },
+      "DLinear": { "MSE": 0.481, "MAE": 0.459 },
+      "Informer": { "MSE": 1.107, "MAE": 0.809 }
+    },
+    "720": {
+      "STF-Net": { "MSE": 0.482, "MAE": 0.472 },
+      "DLinear": { "MSE": 0.519, "MAE": 0.516 },
+      "Informer": { "MSE": 1.181, "MAE": 0.865 }
+    }
+  },
+  "Weather": {
+    "96": {
+      "STF-Net": { "MSE": 0.163, "MAE": 0.207 },
+      "DLinear": { "MSE": 0.176, "MAE": 0.237 },
+      "Informer": { "MSE": 0.300, "MAE": 0.384 }
+    },
+    "192": {
+      "STF-Net": { "MSE": 0.208, "MAE": 0.252 },
+      "DLinear": { "MSE": 0.220, "MAE": 0.282 },
+      "Informer": { "MSE": 0.598, "MAE": 0.544 }
+    },
+    "336": {
+      "STF-Net": { "MSE": 0.264, "MAE": 0.298 },
+      "DLinear": { "MSE": 0.279, "MAE": 0.329 },
+      "Informer": { "MSE": 0.578, "MAE": 0.523 }
+    },
+    "720": {
+      "STF-Net": { "MSE": 0.339, "MAE": 0.353 },
+      "DLinear": { "MSE": 0.354, "MAE": 0.384 },
+      "Informer": { "MSE": 1.059, "MAE": 0.741 }
+    }
+  },
+  "Electricity": {
+    "96": {
+      "STF-Net": { "MSE": 0.182, "MAE": 0.268 },
+      "DLinear": { "MSE": 0.197, "MAE": 0.282 },
+      "Informer": { "MSE": 0.274, "MAE": 0.368 }
+    },
+    "192": {
+      "STF-Net": { "MSE": 0.195, "MAE": 0.280 },
+      "DLinear": { "MSE": 0.209, "MAE": 0.291 },
+      "Informer": { "MSE": 0.296, "MAE": 0.386 }
+    },
+    "336": {
+      "STF-Net": { "MSE": 0.211, "MAE": 0.297 },
+      "DLinear": { "MSE": 0.223, "MAE": 0.305 },
+      "Informer": { "MSE": 0.300, "MAE": 0.394 }
+    },
+    "720": {
+      "STF-Net": { "MSE": 0.253, "MAE": 0.331 },
+      "DLinear": { "MSE": 0.268, "MAE": 0.342 },
+      "Informer": { "MSE": 0.373, "MAE": 0.439 }
+    }
+  },
+  "Ablation": {
+    "STF-Net (Full)": { "MSE": 0.362, "MAE": 0.388 },
+    "w/o Fourier Temporal Mixing": { "MSE": 0.412, "MAE": 0.425 },
+    "w/o Spatial Channel Interaction": { "MSE": 0.394, "MAE": 0.410 },
+    "w/o Residual Connections": { "MSE": 0.435, "MAE": 0.448 }
+  },
+  "Efficiency": {
+    "STF-Net": { "Params_K": 128.4, "Latency_ms": 1.82, "MACs_G": 0.08 },
+    "DLinear": { "Params_K": 74.2, "Latency_ms": 1.25, "MACs_G": 0.03 },
+    "Informer": { "Params_K": 642.8, "Latency_ms": 8.45, "MACs_G": 0.42 }
+  }
+}
