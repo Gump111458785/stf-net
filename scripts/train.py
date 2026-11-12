@@ -28,7 +28,7 @@ def parse_args():
     parser.add_argument("--pred_len", type=int, default=96, help="Forecasting horizon length")
     parser.add_argument("--modes", type=int, default=32, help="Fourier frequency modes")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
-    parser.add_argument("--epochs", type=int, default=10, help="Training epochs")
+    parser.add_argument("--epochs", type=int, default=3, help="Training epochs (default: 3 for rapid evaluation <=15min)")
     parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
     parser.add_argument("--device", type=str, default="cuda", help="Target device (must be cuda)")
     parser.add_argument("--save_dir", type=str, default="./checkpoints")
